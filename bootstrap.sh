@@ -1,6 +1,16 @@
 #!/bin/bash
 
-apt-get install wget curl git zip unzip htop software-properties-common python-setuptools build-essential gcc node-rimraf automake autoconf screen supervisor -y
+apt-get install wget curl git zip unzip htop software-properties-common python-setuptools build-essential gcc automake autoconf screen supervisor -y
+
+
+###customize bashrc
+
+install_bashrc(){
+
+apt-get install node-rimraf lsscsi lm-sensors fortune-mod -y
+
+}
+
 
 ###install chromium browser
 
