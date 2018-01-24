@@ -48,11 +48,12 @@ function add_web_server_ingress_egress_rule(){
 	printf "\n ###############################web server security group created###########################\n"
 }
 
-#setup an SSH ingress rule for my home IP. so portrange is from 22 to 22. So only port 22 is allowed
-#function add_ssh_ingress_rule(){
-
-	#aws ec2 authorize-security-group-ingress --group-id $1 --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "IpRanges": [{"CidrIp": "1.2.3.4/16", "Description": "SSH access from my home"}]}]'
-#}
+#setup an SSH ingress rule for a particular source. so portrange is from 22 to 22. So only port 22 is allowed
+function add_ssh_ingress_rule(){
+	read -p "Enter source IP address for SSH(eg. 192.168.1.0/32): " ip
+	read -p "Enter description for above IP address(eg. office-ip): " description
+	aws ec2 authorize-security-group-ingress --group-id $1 --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "IpRanges": [{"CidrIp": '\"${ip}\"', "Description": '\"${description}\"'}]}]'
+}
 
 #create security group
 function create_security_group(){
@@ -63,6 +64,7 @@ function create_security_group(){
 	printf "\n#########################Removing defualt egress rule from ${sg_id} security group###########################\n"
 	remove_default_egress_rule ${sg_id}
 	add_web_server_ingress_egress_rule ${sg_id}
+	add_ssh_ingress_rule ${sg_id}
 }
 
 check_aws
