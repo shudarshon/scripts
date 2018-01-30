@@ -1,7 +1,7 @@
 [tomcat-servers]
-192.168.1.20
+192.168.2.1
 
 [tomcat-servers:vars]
-ansible_ssh_user=ubuntu
-#ansible_ssh_user=ec2-user
-ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa
+ansible_ssh_user=ubuntu     #ubuntu os
+#ansible_ssh_user=ec2-user  #redhat/centos
+ansible_ssh_private_key_file=~/keyfile/app.pem

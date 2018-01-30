@@ -1,0 +1,17 @@
+---
+# Here are variables related to the Tomcat installation
+
+http_port: 8080
+https_port: 8443
+
+# This will configure a default manager-gui user:
+
+admin_username: admin
+admin_password: adminsecret
+
+# Tomcat Version Download
+
+tomcat_version: "8.5.5"
+tomcat_build_name: "apache-tomcat-{{ tomcat_version }}"
+tomcat_package: "{{ tomcat_build_name }}.tar.gz"
+tomcat_url: "https://archive.apache.org/dist/tomcat/tomcat-{{ tomcat_version[0:1] }}/v{{ tomcat_version }}/bin/{{ tomcat_package }}"
