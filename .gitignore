@@ -1,2 +1,2 @@
-#ansible/**/hosts
-#ansible/**/play.yml
+ansible/**/hosts
+ansible/**/play.yml
