@@ -1,2 +1,2 @@
-ansible/**/hosts
-ansible/**/play.yml
+ansible/role-collection/hosts
+ansible/role-collection/play.yml

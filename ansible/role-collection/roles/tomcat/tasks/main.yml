@@ -1,0 +1,68 @@
+---
+
+#- name: set variable
+
+- name: verify JAVA_HOME
+  shell: export JAVA_HOME={{ java_home }}
+  become: yes
+  
+- name: add group "tomcat"
+  group: name={{ tomcat_group }}
+
+- name: add user "tomcat"
+  user: name={{ tomcat_user }} group={{ tomcat_group }} home={{ tomcat_home_dir }} createhome=no shell=/bin/false
+  become: yes
+  become_method: sudo
+
+- name: Download Tomcat archieve
+  get_url: url={{ tomcat_url }} dest=/opt/{{ tomcat_package }}
+
+- name: Extract tomcat archive
+  command: chdir=/opt /bin/tar xvf /opt/{{ tomcat_package }} -C /opt creates=/opt/{{ tomcat_build_name }}
+
+
+- name: Rename tomcat directory and set permission
+  command: mv /opt/{{ tomcat_build_name }} {{ tomcat_home_dir }}
+
+- name: Change app directory permission
+  file: path={{ tomcat_app_path }} owner={{ tomcat_user }} group={{ tomcat_group }} state=directory recurse=yes
+
+
+#- name: Symlink install directory
+#  file: src={{ tomcat_home_dir }} dest={{ tomcat_app_path }} state=link #mode=0755 #owner={{ tomcat_user }} group={{ tomcat_group }} #recurse=yes
+  #file: src=/opt/{{ tomcat_home_dir }} dest={{ tomcat_app_path }} state=link #mode=0755 #owner={{ tomcat_user }} group={{ tomcat_group }} #recurse=yes
+
+#- name: Change ownership of Tomcat installation
+#  file: path={{ tomcat_app_path }} owner={{ tomcat_user }} group={{ tomcat_group }} state=directory recurse=yes
+#  command: chown -R {{ tomcat_user }}:{{ tomcat_user }} {{ tomcat_app_path }}
+
+- name: Install Tomcat service script
+  template:
+    src: tomcat.service.j2
+    dest: /etc/systemd/system/tomcat.service
+    #src: tomcat-initscript.sh.j2
+    #dest: /etc/init.d/tomcat
+    #mode: 0755
+  notify:
+    - reload systemd
+    - start tomcat
+
+- name: Configure Tomcat server
+  template:
+    src: server.xml
+    dest: "{{ tomcat_app_path }}/conf/"
+  notify: restart tomcat
+
+- name: Configure Tomcat users
+  template:
+    src: tomcat-users.xml
+    dest: "{{ tomcat_app_path }}/conf/"
+  notify: restart tomcat
+
+- name: Remove tomcat downloaded sourcecode
+  file:
+    state: absent
+    path: /opt/{{ tomcat_package }}
+
+#- name: wait for tomcat to start
+#  wait_for: port={{http_port}}
