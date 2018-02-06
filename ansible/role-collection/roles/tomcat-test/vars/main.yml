@@ -1,21 +1,50 @@
 ---
-#tomcat_archive_name: "apache-tomcat-8.5.5"
-#tomcat_archive_name_ext: ".tar.gz"
-#tomcat_archive_url: "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.5/bin"
-#tomcat_home_path: "/opt/tomcat"
-#tomcat_archive_install_path: "{{tomcat_home_path}}/{{tomcat_archive_name}}"
-#tomcat_install_link: "{{tomcat_home_path}}/current"
+
 tomcat_roles:
   - manager-gui
   - manager-script
-  - manager-jmx
   - manager-status
-#tomcat_users: []
+  - manager-jmx
+  - admin-gui
+  - admin-script
+
+tomcat_users: [
+  {
+    "name": "{{ admin_username }}",
+    "password": "{{ admin_password }}",
+    "roles": "manager-gui"
+  },
+  {
+    "name": "{{ admin_username }}",
+    "password": "{{ admin_password }}",
+    "roles": "manager-script"
+  },
+  {
+    "name": "{{ admin_username }}",
+    "password": "{{ admin_password }}",
+    "roles": "manager-status"
+  },
+  {
+    "name": "{{ admin_username }}",
+    "password": "{{ admin_password }}",
+    "roles": "manager-jmx"
+  },
+  {
+    "name": "{{ admin_username }}",
+    "password": "{{ admin_password }}",
+    "roles": "admin-gui"
+  },
+  {
+    "name": "{{ admin_username }}",
+    "password": "{{ admin_password }}",
+    "roles": "admin-script"
+  }
+]
 
 # This will configure a default manager-gui user:
 
-admin_username: admin
-admin_password: adminsecret
+admin_username: admin         #later this one will be colected from ansible vault
+admin_password: adminsecret   #later this one will be colected from ansible vault
 
 # Tomcat Version Download
 
