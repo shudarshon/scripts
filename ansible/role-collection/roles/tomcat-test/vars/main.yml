@@ -1,16 +1,16 @@
 ---
-tomcat_archive_name: "apache-tomcat-8.5.5"
-tomcat_archive_name_ext: ".tar.gz"
-tomcat_archive_url: "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.5/bin"
-tomcat_home_path: "/opt/tomcat"
-tomcat_archive_install_path: "{{tomcat_home_path}}/{{tomcat_archive_name}}"
-tomcat_install_link: "{{tomcat_home_path}}/current"
+#tomcat_archive_name: "apache-tomcat-8.5.5"
+#tomcat_archive_name_ext: ".tar.gz"
+#tomcat_archive_url: "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.5/bin"
+#tomcat_home_path: "/opt/tomcat"
+#tomcat_archive_install_path: "{{tomcat_home_path}}/{{tomcat_archive_name}}"
+#tomcat_install_link: "{{tomcat_home_path}}/current"
 tomcat_roles:
   - manager-gui
   - manager-script
   - manager-jmx
   - manager-status
-tomcat_users: []
+#tomcat_users: []
 
 # This will configure a default manager-gui user:
 
@@ -28,3 +28,12 @@ tomcat_url: "https://archive.apache.org/dist/tomcat/tomcat-{{ tomcat_version[0:1
 
 tomcat_home_dir: /opt/tomcat
 tomcat_app_path: /opt/tomcat
+
+# Java home directry
+
+tomcat_java_home: /usr/lib/jvm/java-8-oracle
+
+# Tomcat user and group Rename
+
+tomcat_user: tomcat
+tomcat_group: tomcat
