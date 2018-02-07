@@ -1,4 +1,27 @@
 ---
+# Tomcat Version Download
+
+#tomcat_version: "8.5.9"
+tomcat_version: "9.0.4"
+tomcat_build_name: "apache-tomcat-{{ tomcat_version }}"
+tomcat_package: "{{ tomcat_build_name }}.tar.gz"
+tomcat_url: "https://archive.apache.org/dist/tomcat/tomcat-{{ tomcat_version[0:1] }}/v{{ tomcat_version }}/bin/{{ tomcat_package }}"
+
+# Tomcat installation directory
+
+tomcat_home_dir: /opt/tomcat
+tomcat_app_path: /usr/share/tomcat
+
+# Java home directry
+
+tomcat_java_home: /usr/lib/jvm/java-8-oracle
+
+# Tomcat user and group
+
+tomcat_user: tomcat
+tomcat_group: tomcat
+
+# Tomcat roles
 
 tomcat_roles:
   - manager-gui
@@ -7,6 +30,8 @@ tomcat_roles:
   - manager-jmx
   - admin-gui
   - admin-script
+
+# Tomcat user, password and assigned role
 
 tomcat_users: [
   {
@@ -45,24 +70,3 @@ tomcat_users: [
 
 admin_username: admin         #later this one will be colected from ansible vault
 admin_password: adminsecret   #later this one will be colected from ansible vault
-
-# Tomcat Version Download
-
-tomcat_version: "8.5.5"
-tomcat_build_name: "apache-tomcat-{{ tomcat_version }}"
-tomcat_package: "{{ tomcat_build_name }}.tar.gz"
-tomcat_url: "https://archive.apache.org/dist/tomcat/tomcat-{{ tomcat_version[0:1] }}/v{{ tomcat_version }}/bin/{{ tomcat_package }}"
-
-# Tomcat installation directory
-
-tomcat_home_dir: /opt/tomcat
-tomcat_app_path: /opt/tomcat
-
-# Java home directry
-
-tomcat_java_home: /usr/lib/jvm/java-8-oracle
-
-# Tomcat user and group Rename
-
-tomcat_user: tomcat
-tomcat_group: tomcat
