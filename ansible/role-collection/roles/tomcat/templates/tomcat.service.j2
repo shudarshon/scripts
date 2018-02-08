@@ -1,12 +1,11 @@
-# Systemd unit file for tomcat
 [Unit]
 Description=Apache Tomcat Web Application Container
-After=syslog.target network.target
+After=network.target
 
 [Service]
 Type=forking
 
-Environment=JAVA_HOME={{ java_home }}
+Environment=JAVA_HOME={{ tomcat_java_home }}
 Environment=CATALINA_PID={{ tomcat_app_path }}/temp/tomcat.pid
 Environment=CATALINA_HOME={{ tomcat_app_path }}
 Environment=CATALINA_BASE={{ tomcat_app_path }}
@@ -16,8 +15,11 @@ Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./
 ExecStart={{ tomcat_app_path }}/bin/startup.sh
 ExecStop={{ tomcat_app_path }}/bin/shutdown.sh
 
-User={{ tomcat_user }}
-Group={{ tomcat_group }}
+User=tomcat
+Group=tomcat
+UMask=0007
+RestartSec=10
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
