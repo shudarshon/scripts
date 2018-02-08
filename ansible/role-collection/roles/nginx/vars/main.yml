@@ -1,0 +1,9 @@
+---
+
+# Web Application Configurations
+
+app_port: 8080
+
+access_log:
+
+error_log:
