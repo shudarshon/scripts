@@ -1,71 +1,51 @@
 ---
-#
-# Task file to install Oracle Java Development Kit in a system with a Redhat based Linux distribution.
-#
+# Copy java source file to remote server
+- name: Copy Java source tar to remote server
+  copy:
+    src: "{{ java_package_name }}"  #java source tar is placed in files directory of ansible role
+    dest: /tmp
+    remote_src: no
+    mode: 0755
+  tags: [copy_java_package]
 
-- name: Get latest JDK download page
-  uri:
-    url: http://www.oracle.com/technetwork/java/javase/downloads/index.html
-    return_content: yes
-  register: result
+# Create java home directory
+- name: Create java home directory path
+  command: "mkdir -p {{ java_src_root }}"
+  tags: [create_java_home_dir]
 
-- name: Determine latest java download page and version
-  set_fact: latest_java_page_and_version="{{ (result.content.replace('\n','')|regex_replace('.*(/technetwork/java/javase/downloads/jdk(\d+)-downloads.*?.html).*', 'http://www.oracle.com/\1\n\2')).split('\n') }}"
+# Extract java source code
+- name: Extract java source file
+  command: "chdir=/tmp /bin/tar xvf {{ java_package_path }} -C /tmp creates={{ java_build_path }}"
+  tags: [extract_java_src]
 
-- name: Define download page URL based on latest version
-  set_fact: download_page_url="{{ latest_java_page_and_version[0] }}"
-  when: "{{ latest_java_page_and_version[1]|version_compare(oracle_java_version,'=') }}"
+# Create java source code directory
+- name: Create java source directory
+  command: "cp -r {{ java_build_path }} {{ java_home }}"
+  tags: [create_java_home_dir]
 
-- block:
-
-  - name: Get lastest JDK rpm url
-    uri: url="{{ result.content.replace('\n','')|regex_replace('.*(/technetwork/java/javase/archive-.*?.html).*','http://www.oracle.com/\1') }}"
-         return_content=yes
-    register: result
-
-  - name: Define download page URL for "{{ oracle_java_version }}"
-    set_fact: download_page_url="{{ result.content|regex_search('href=\"[^\"]+\">Java SE\s+' + (oracle_java_version|string) + '\s?<')|regex_replace('.*href=\"([^\"]+)\".*','http://www.oracle.com/\1') }}"
-
-  when: "{{ latest_java_page_and_version[1]|version_compare(oracle_java_version,'!=') and oracle_java_version }}"
-
-- name: Show download page URL
-  debug: "{{ download_page_url }}"
-
-- name: Get lastest JDK rpm url
-  uri: url="{{ download_page_url }}"
-       return_content=yes
-  register: result
-
-- name: Set oracle_java_rpm_url
-  set_fact: oracle_java_rpm_url="{{ result.content|regex_search('https?://download.oracle.com/.*?/jdk-\w+-linux-' + oracle_java_ansible_arch_mappings[ansible_architecture] + '.rpm') }}"
-
-- name: Set some variables
-  set_fact: oracle_java_rpm_filename="{{ oracle_java_rpm_url | basename }}"
-            oracle_java_version="{{ oracle_java_rpm_url | basename|regex_replace('jdk-(\d+)u(\d+)-linux.*','\1') }}"
-            oracle_java_version_update="{{ oracle_java_rpm_url | basename|regex_replace('jdk-(\d+)u(\d+)-linux.*','\2') }}"
-
-
-#- debug: "Downloading java {{ oracle_java_version }}u{{ oracle_java_version_update }} to {{ oracle_java_rpm_filename }} from {{ oracle_java_rpm_url }}"
-
-- name: Download Java RPM
-  get_url:
-    headers='Cookie:gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie'    dest="{{ oracle_java_dir_source }}/{{ oracle_java_rpm_filename }}"
-    url="{{ oracle_java_rpm_url }}"
-    validate_certs="{{ oracle_java_rpm_validate_certs }}"
-    timeout={{ oracle_java_download_timeout }}
-  register: oracle_java_task_rpm_download
-  become: yes
-  tags: [ installation ]
-
-- name: Install JDK RPM
-  action: "{{ ansible_pkg_mgr }} name={{ oracle_java_dir_source }}/{{ oracle_java_rpm_filename }} state=present"
-  when: not oracle_java_task_rpm_download|skipped
-  become: yes
-  tags: [ installation ]
-
+# Set oracle java as default version
 - name: Set Oracle Java version as default
   alternatives:
+    link: /usr/bin/java
     name: java
-    path: "/usr/java/jdk1.{{ oracle_java_version }}.0_{{ oracle_java_version_update }}/jre/bin/java"
-  tags: [ default ]
+    path: "{{ java_home }}/bin/java"
+  tags: [ make_default ]
   become: yes
+
+# Environment variable setup
+- name: Set JAVA_HOME if configured.
+  template:
+    src: java_home.sh.j2
+    dest: /etc/profile.d/java_home.sh
+    mode: 0644
+  when: java_home is defined and java_home != ''
+
+# Remove java source tar
+- name: Remove artifact
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ java_package_path }}"
+    - "{{ java_build_path }}"
+  tags: [remove_artifact]
