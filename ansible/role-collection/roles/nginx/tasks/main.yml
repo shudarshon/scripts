@@ -1,1 +1,8 @@
 ---
+
+- name: Install nginx
+  package:
+    - name: nginx
+    - state: latest
+    - enabled: yes
+
