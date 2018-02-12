@@ -9,6 +9,7 @@
     repo=ppa:webupd8team/java
     state=present
   become: yes
+  tags: [add_ppa]
 
 - block:
   - name: Ensure the webupd8 launchpad apt repository key is present
@@ -33,6 +34,7 @@
 - name: Set license as accepted
   debconf: name='oracle-java{{ oracle_java_version }}-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
   become: yes
+  tags: [accept_license]
 
 - name: Ensure Java is installed
   apt:
@@ -41,3 +43,9 @@
     cache_valid_time={{ oracle_java_cache_valid_time }}
     update_cache=yes
   become: yes
+  tags: [install_java]
+
+- name: Export JAVA_HOME java_build_path
+  shell: "export JAVA_HOME={{ oracle_java_home }}"
+  become: yes
+  tags: [export_java_home]
