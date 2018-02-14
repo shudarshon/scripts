@@ -113,6 +113,7 @@
   notify:
     - reload systemd
     - restart tomcat
+    - restart nginx
   tags: [systemd_script_install]
 
 # Removing tomcat tar.gz file and other artifacts
