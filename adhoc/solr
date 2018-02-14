@@ -1,0 +1,5 @@
+#!/bin/bash
+wget http://www-eu.apache.org/dist/lucene/solr/7.2.1/solr-7.2.1.tgz
+tar xzf solr-7.2.1.tgz solr-7.2.1/bin/install_solr_service.sh --strip-components=2
+sudo bash ./install_solr_service.sh solr-7.2.1.tgz
+sudo su - solr -c "/opt/solr/bin/solr create -c mycol1 -n data_driven_schema_configs"

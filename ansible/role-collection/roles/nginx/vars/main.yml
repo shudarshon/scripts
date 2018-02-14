@@ -2,7 +2,7 @@
 
 # Web Application Configurations
 
-app_port: 8080
+app_port: 8983
 
 access_log:
 
