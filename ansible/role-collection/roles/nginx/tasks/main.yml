@@ -45,5 +45,6 @@
     dest: "{{ app_config_path_link }}"
     state: link
     mode: 0644
-  notify: restart nginx
+  notify:
+    - restart nginx
   tags: [symlink_nginx_app_config]
