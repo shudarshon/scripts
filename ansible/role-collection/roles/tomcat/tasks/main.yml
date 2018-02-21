@@ -16,7 +16,7 @@
   user:
     name: "{{ tomcat_user }}"
     group: "{{ tomcat_group }}"
-    shell: /bin/false
+    shell: /bin/bash
     home: "{{tomcat_home_dir}}"
     system: yes
     createhome: no
