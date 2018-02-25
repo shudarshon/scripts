@@ -1,3 +1,3 @@
-ansible/role-collection/hosts
-ansible/role-collection/play.yml
+ansible/**/hosts
+ansible/**/play.yml
 ansible/**/jdk-*.tar.gz
