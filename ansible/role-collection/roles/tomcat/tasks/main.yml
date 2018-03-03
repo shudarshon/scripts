@@ -22,30 +22,16 @@
     createhome: no
   tags: [create_tomcat_user]
 
-# Download tomcat compressed file
-- name: Download Tomcat archive
-  get_url: url={{ tomcat_url }} dest=/opt/{{ tomcat_package }}
-  tags: [download_tomcat]
-
-# Extract tomcat source code
-- name: Extract tomcat archive
-  command: chdir=/opt /bin/tar xvf /opt/{{ tomcat_package }} -C /opt creates=/opt/{{ tomcat_build_name }}
-  tags: [extract_archive]
-
-# Create app directory from tomcat source code
-- name: Create tomcat app directory
-  command: cp -r /opt/{{ tomcat_build_name }} {{tomcat_home_dir}}
-  tags: [create_app_dir]
-
-# Change ownership of app directory
-- name: Change ownership of app directory
-  file:
-    path: "{{tomcat_home_dir}}"
+# Download and extract specific tomcat version
+- name: Download and extract tomcat archive
+  unarchive:
+    src: "{{ tomcat_url }}"
+    dest: /opt
+    copy: no
     mode: 0750
+    owner: root
     group: "{{ tomcat_group }}"
-    state: directory
-    recurse: yes
-  tags: [change_appdir_perm]
+  tags: [download_extract]
 
 # Set tomcat user permission of work, webapps, temp and logs directory
 - name: Make the tomcat user the owner of the webapps, work, temp, and logs directories
@@ -83,7 +69,7 @@
   template:
     src: tomcat-users.xml.j2
     dest: "{{tomcat_home_dir}}/conf/tomcat-users.xml"
-  notify: restart tomcat
+  #notify: restart tomcat
   tags: [apply_tomcat_user_role]
 
 # Changing IP restricion of tomcat app server from localhost to any IP
@@ -91,7 +77,7 @@
   template:
     src: context.xml.j2
     dest: "{{ item }}"
-  notify: restart tomcat
+  #notify: restart tomcat
   with_items:
     - "{{tomcat_home_dir}}/webapps/host-manager/META-INF/context.xml"
     - "{{tomcat_home_dir}}/webapps/manager/META-INF/context.xml"
@@ -109,19 +95,10 @@
 - name: Create systemd service script for Tomcat
   template:
     src: "tomcat.service.j2"
-    dest: "/etc/systemd/system/tomcat.service"
+    dest: "/lib/systemd/system/tomcat.service"
   notify:
     - reload systemd
+    - enable tomcat
     - restart tomcat
-    - restart nginx
+    #- restart nginx
   tags: [systemd_script_install]
-
-# Removing tomcat tar.gz file and other artifacts
-- name: Remove tomcat downloaded sourcecode
-  file:
-    state: absent
-    path: "{{ item }}"
-  with_items:
-    - "/opt/{{ tomcat_package }}"
-    - "/opt/{{ tomcat_build_name }}"
-  tags: [remove_artifact]
