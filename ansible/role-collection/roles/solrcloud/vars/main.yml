@@ -1,7 +1,0 @@
----
-
-solr_cloud_version: "7.2.1"
-solr_cloud_build_name: "solr-{{ solr_cloud_version }}"
-solr_cloud_package: "{{ solr_cloud_build_name }}.tgz"
-solr_cloud_url: "http://archive.apache.org/dist/lucene/solr/{{ solr_cloud_version }}/{{ solr_cloud_package }}"
-#http://www-us.apache.org/dist/lucene/solr/7.2.1/solr-7.2.1-src.tgz
