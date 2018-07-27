@@ -1,45 +1,15 @@
 #!/bin/bash
+set -x
 
-sudo apt-get install wget curl git zip unzip htop software-properties-common python-setuptools build-essential gcc automake autoconf screen supervisor -y
+###install essential packages
 
-
-###customize bashrc
-
-install_bashrc(){
-
-sudo apt-get install node-rimraf lsscsi lm-sensors fortune-mod -y
-
-}
-
-
-###install chromium browser
-
-install_chrome() {
-
-sudo apt-get install chromium-browser -y
-
-}
-
-###install atom
-
-install_atom() {
-
-sudo add-apt-repository ppa:webupd8team/atom -y
-sudo apt-get update
-sudo apt-get install atom -y
-
-}
-
-###install and customize vim
-
-install_vim() {
+install_essential(){
 
 sudo apt-get update
-sudo apt-get install vim -y
-git clone --recursive https://github.com/jessfraz/.vim.git .vim
-ln -sf $HOME/.vim/vimrc $HOME/.vimrc
-cd $HOME/.vim
-git submodule update --init
+sudo apt-get install git software-properties-common build-essential apt-transport-https \
+wget curl zip unzip bzip2 rar unrar openssh-client \
+htop facter ohai net-tools lsof htop tcpdump screen \
+automake autoconf maven gradle ant -y
 
 }
 
@@ -47,6 +17,7 @@ git submodule update --init
 
 install_python_pip() {
 
+sudo apt-get install python-dev python-setuptools -y
 curl -O https://bootstrap.pypa.io/get-pip.py
 sudo python get-pip.py
 rm get-pip.py
@@ -55,50 +26,26 @@ rm get-pip.py
 
 ###installing ansible
 
-install_ansible() {
+install_pip_packages() {
 
-pip install ansible --upgrade --user
-
-}
-
-###installing awscli
-
-install_awscli() {
-
-pip install --upgrade awscli --user
-pip install saws  --user
+sudo pip install ansible --upgrade --user
+sudo pip install --upgrade awscli --user
+sudo pip install saws  --user
+sudo pip install fabric --upgrade --user
+sudo pip install virtualenv --upgrade --user
 aws --version
 
 }
 
-###install fabric
-
-install_fabric() {
-
-pip install fabric --upgrade --user
-
-}
 ###install java
 
 install_java() {
 
 sudo add-apt-repository ppa:webupd8team/java -y
-sudo apt update
+sudo apt update -y
 sudo apt install oracle-java8-installer -y
-sudo update-alternatives --config java	            #choose the java path from here
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
-whereis java
-java --version
-
-}
-
-###installing sdkman
-
-install_sdkman() {
-
-curl -s "https://get.sdkman.io" | sudo bash
-source "$HOME/.sdkman/bin/sdkman-init.sh"
-sdk version
+java -version
 
 }
 
@@ -106,7 +53,7 @@ sdk version
 
 install_node_yarn() {
 
-curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
 sudo bash nodesource_setup.sh
 sudo apt-get install nodejs -y
 
@@ -133,9 +80,35 @@ sudo systemctl status docker
 sudo usermod -aG docker ${USER}
 sudo docker info
 
-curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
-sudo docker-compose --version
+docker-compose --version
+
+}
+
+###installing packer
+
+install_packer(){
+
+sudo apt-get update --fix-missing
+wget https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_linux_amd64.zip -O packer.zip
+unzip packer.zip
+sudo mv packer /usr/local/bin/
+rm packer.zip
+packer -v
+
+}
+
+###installing terraform
+
+install_terraform(){
+
+sudo apt-get update --fix-missing
+wget https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip -O terraform.zip
+unzip terraform.zip
+sudo mv terraform /usr/local/bin/
+rm terraform*
+terraform -v
 
 }
 
@@ -151,46 +124,97 @@ kubectl -v
 
 }
 
-###installing packer
+###installing kubectl-k8s administering tool
 
-install_packer(){
+install_k8s() {
 
 sudo apt-get update --fix-missing
-wget https://releases.hashicorp.com/packer/1.1.0/packer_1.1.0_linux_amd64.zip?_ga=2.232436184.61790985.1507479007-1415811543.1507479007 -O packer.zip
-unzip packer.zip
-sudo mv packer /usr/local/bin/
-rm packer.zip
-packer -v
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+kubectl -v
+
+}
+###installing saltstack
+
+install_saltstack() {
+
+sudo add-apt-repository ppa:saltstack/salt -y
+sudo apt-get update
+sudo apt-get install salt-master salt-minion salt-ssh salt-cloud salt-doc -y
 
 }
 
-###installing terraform
+###install and customize vim
 
-install_terraform(){
+install_vim() {
 
-sudo apt-get update --fix-missing
-wget https://releases.hashicorp.com/terraform/0.9.11/terraform_0.9.11_linux_386.zip?_ga=2.175031905.2120335327.1499887964-1517736643.1499887964
-mv terraform_0.9.11_linux_386.zip\?_ga\=2.175031905.2120335327.1499887964-1517736643.1499887964 terraform.zip
-unzip terraform.zip
-sudo mv terraform /usr/local/bin/
-rm terraform*
-terraform -v
+sudo apt-get update
+sudo apt-get install vim -y
+git clone --recursive https://github.com/jessfraz/.vim.git .vim
+ln -sf $HOME/.vim/vimrc $HOME/.vimrc
+cd $HOME/.vim
+git submodule update --init
 
 }
+
+###customize bashrc
+
+install_bashrc(){
+
+sudo apt-get install node-rimraf lsscsi lm-sensors fortune-mod -y
+git clone https://github.com/shudarshon/bashrc.git
+cp bashrc/.bashrc $HOME/.bashrc
+cp -r bashrc/.shells $HOME/
+rm -rf bashrc
+
+}
+
+### install tilix
+
+install_tilix(){
+
+sudo add-apt-repository ppa:webupd8team/terminix -y
+sudo apt-get update
+sudo apt-get install tilix -y
+
+}
+
+###install chromium browser
+
+install_chrome() {
+
+sudo apt-get install chromium-browser -y
+
+}
+
+###install atom
+
+install_atom() {
+
+sudo add-apt-repository ppa:webupd8team/atom -y
+sudo apt-get update
+sudo apt-get install atom -y
+
+}
+
 
 ###installing progam
 
+install_essential
 install_python_pip
-install_awscli
-install_fabric
-install_ansible
+install_pip_packages
 install_java
+install_node_yarn
 install_docker
-install_k8s
 install_packer
 install_terraform
-install_sdkman
-install_node_yarn
-install_chrome
+install_k8s
+install_saltstack
+
 install_vim
-install_atom
+install_bashrc
+install_tilix
+
+#install_chrome
+#install_atom
