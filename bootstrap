@@ -9,6 +9,7 @@ sudo apt-get update
 sudo apt-get install git software-properties-common build-essential apt-transport-https \
 wget curl zip unzip bzip2 rar unrar openssh-client \
 htop facter ohai net-tools lsof htop tcpdump screen \
+nmap wireshark nemesis nessus \
 automake autoconf maven gradle ant -y
 
 }
@@ -56,6 +57,7 @@ install_node_yarn() {
 curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
 sudo bash nodesource_setup.sh
 sudo apt-get install nodejs -y
+rm nodesource_setup.sh
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
@@ -76,7 +78,6 @@ sudo apt-cache policy docker-ce
 sudo apt-get install -y docker-ce -y
 sudo systemctl enable docker
 sudo systemctl start docker
-sudo systemctl status docker
 sudo usermod -aG docker ${USER}
 sudo docker info
 
@@ -216,5 +217,5 @@ install_vim
 install_bashrc
 install_tilix
 
-#install_chrome
-#install_atom
+install_chrome
+install_atom
