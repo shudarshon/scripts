@@ -1,0 +1,18 @@
+#!/bin/bash
+
+TARGET="/var/lib/efs"
+EFS_URL="fs-xxxxxxx.efs.us-east-x.amazonaws.com:/"
+
+if [[ $(grep -w ID /etc/os-release | cut -d \= -f2) == [Uu][Bb][Uu][Nn][Tt][Uu] ]]
+then
+  sudo apt-get update -y
+  sudo apt-get install nfs-common -y
+elif [[ $(grep -w ID /etc/os-release | cut -d \" -f2) == [Aa][Mm][Zz][Nn] ]]
+then
+    sudo yum update -y
+    sudo yum install amazon-efs-utils -y
+fi
+mkdir -p $TARGET
+echo "$EFS_URL $TARGET nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0" | tee --append /etc/fstab
+mount -a
+
